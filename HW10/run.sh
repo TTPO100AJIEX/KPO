@@ -1,4 +1,4 @@
 cd src
 javac **/*.java -d ../vm
 cd ../
-java -classpath vm observer/Application
+java -classpath vm multithreading/Test
