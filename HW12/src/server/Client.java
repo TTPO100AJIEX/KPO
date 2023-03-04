@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class Client extends Thread
 {
-    private Socket client;
+    private Socket socket;
     private ClientsHolder clients;
     private String name = "Unknown";
     private BufferedReader in;
@@ -19,12 +19,13 @@ public class Client extends Thread
         try
         {
             this.clients = clients;
-            this.client = client;
-            this.in = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+            this.socket = client;
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.out = new DataOutputStream(client.getOutputStream());
             this.clients.add(this);
         } catch(IOException err) { }
     }
+    public boolean isOpened() { return !this.socket.isInputShutdown(); }
     
     @Override
     public void run()
@@ -33,7 +34,13 @@ public class Client extends Thread
         {
             this.name = this.in.readLine();
             this.clients.send(this.name + " joined");
-            while (true) this.clients.send(this.name + ": " + this.in.readLine());
+            while (true)
+            {
+                String message = this.in.readLine();
+                if (message == null) break;
+                this.clients.send(this.name + ": " + message);
+                try { Thread.sleep(1000); } catch(Exception e) { }
+            }
         } catch(IOException err) { }
     }
 
