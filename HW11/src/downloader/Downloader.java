@@ -8,7 +8,7 @@ public class Downloader
 {
     Scanner reader = new Scanner(System.in);
     String dest = "data";
-    ExecutorService downloader = Executors.newCachedThreadPool();
+    ExecutorService threadPool = Executors.newCachedThreadPool();
     public Downloader() { }
 
     public void run() { this.awaitCommand(); }
@@ -45,7 +45,7 @@ public class Downloader
     {
         for (int i = 1; i < command.length; i++)
         {
-            this.downloader.execute(new FileDownload(command[i], this.dest));
+            this.threadPool.execute(new FileDownload(command[i], this.dest));
             System.out.println("Scheduled " + command[i]);
         }
     }
@@ -53,7 +53,7 @@ public class Downloader
     private void exit(String[] command)
     {
         this.reader.close();
-        this.downloader.shutdown();
-        while (!this.downloader.isTerminated()) { }
+        this.threadPool.shutdown();
+        while (!this.threadPool.isTerminated()) { }
     }
 }

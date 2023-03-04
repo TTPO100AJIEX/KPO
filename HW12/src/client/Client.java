@@ -5,12 +5,18 @@ import java.net.Socket;
 
 public class Client
 {
-    public static void main(String[] args) throws IOException, InterruptedException
+    String name;
+    Client(String name) { this.name = name; }
+
+    Socket socket;
+    Reader reader;
+    Writer writer;
+    public void run(String address, int port) throws IOException, InterruptedException
     {
-        final Socket client = new Socket("localhost", 80);
-        Reader reader = new Reader(client, args[0]);
-        Writer writer = new Writer(client, args[0]);
-        reader.start(); writer.start();
-        reader.join(); writer.join();
+        this.socket = new Socket(address, port);
+        this.reader = new Reader(this.socket, this.name);
+        this.writer = new Writer(this.socket, this.name);
+        this.reader.start(); this.writer.start();
+        this.reader.join(); this.writer.join();
     }
 }

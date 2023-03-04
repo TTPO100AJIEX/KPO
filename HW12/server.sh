@@ -1,4 +1,4 @@
 cd src
 javac **/*.java -d ../vm
 cd ../
-java -classpath vm server/Server
+java -classpath vm server/Application

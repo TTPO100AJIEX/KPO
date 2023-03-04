@@ -9,13 +9,11 @@ import java.util.Scanner;
 public class Writer extends Thread
 {
     DataOutput stream;
-    Socket socket;
     String name;
-    Writer(Socket client, String name) throws IOException
+    Writer(Socket socket, String name) throws IOException
     {
         this.name = name;
-        this.socket = client;
-        this.stream = new DataOutputStream(client.getOutputStream());
+        this.stream = new DataOutputStream(socket.getOutputStream());
     }
 
     @Override

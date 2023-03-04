@@ -20,7 +20,6 @@ public class Solver extends Thread
         {
             solver.join();
             this.answer = this.answer.add(solver.getAnswer());
-            System.out.println(solver.getAnswer());
         }
     }
     

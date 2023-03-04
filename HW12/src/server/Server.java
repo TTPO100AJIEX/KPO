@@ -5,10 +5,12 @@ import java.net.ServerSocket;
 
 public class Server
 {
-    public static void main(String[] args) throws IOException
+    Server() { }
+
+    public void run(String address, int port) throws IOException
     {
-        final ServerSocket server = new ServerSocket(80);
-        final ClientsHolder clients = new ClientsHolder();
+        ServerSocket server = new ServerSocket(80);
+        ClientsHolder clients = new ClientsHolder();
         while (true)
         {
             new Client(server.accept(), clients).start();

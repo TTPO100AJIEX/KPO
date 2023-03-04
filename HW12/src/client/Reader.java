@@ -8,13 +8,11 @@ import java.net.Socket;
 public class Reader extends Thread
 {
     BufferedReader stream;
-    Socket socket;
     String name;
-    Reader(Socket client, String name) throws IOException
+    Reader(Socket socket, String name) throws IOException
     {
         this.name = name;
-        this.socket = client;
-        this.stream = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        this.stream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
     @Override
@@ -22,7 +20,12 @@ public class Reader extends Thread
     {
         while (true)
         {
-            try { System.out.println(this.stream.readLine()); } catch(IOException err) { }
+            try
+            {
+                String message = this.stream.readLine();
+                if (message == null) break;
+                System.out.println(message);
+            } catch(IOException err) { }
         }
     }
 }
