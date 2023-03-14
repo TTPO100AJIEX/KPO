@@ -1,0 +1,5 @@
+- Everyone has a constructor that initializes the object
+- Everybody has the start method which starts the job. This may start a separate thread if we are not doing independent processes.
+- Makes sense to implement load balancing between managers, cooks, etc. (who can exist in multiple copies). This is done by grpc classes (will describe exact algorithms later, for now no load balancing)
+
+- The visitor only talks to the manager and does not know anything else.
