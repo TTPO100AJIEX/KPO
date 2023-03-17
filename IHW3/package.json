@@ -1,0 +1,17 @@
+{
+    "name": "kpo_ihw3",
+    "type": "module",
+    "version": "1.0.0",
+    "author": "KPO",
+    "license": "MIT",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "node visitor/index.js 8000"
+    },
+    "dependencies": {
+        "@grpc/grpc-js": "^1.8.12",
+        "@grpc/proto-loader": "^0.7.5",
+        "utils": "file:Utils"
+    }
+}
