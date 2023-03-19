@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-service visitor
-{
-    rpc test(voidNoParam) returns(voidNoParam);
-}
-
-message voidNoParam {}

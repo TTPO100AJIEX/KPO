@@ -2,6 +2,13 @@ syntax = "proto3";
 
 service manager
 {
+    rpc getMenu(voidNoParam) returns (menu);
+    rpc placeOrder(menu) returns (voidNoParam);
 }
 
 message voidNoParam {}
+
+message menu
+{
+    string data = 1;
+}

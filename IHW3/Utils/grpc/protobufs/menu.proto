@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-service menu
-{
-}
-
-message voidNoParam {}

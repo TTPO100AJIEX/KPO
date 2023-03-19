@@ -1,16 +1,25 @@
-import { VisitorServer } from "utils/grpc/servers/index.js";
-import { ManagerClient } from "utils/grpc/clients/index.js";
+import ManagerClient from 'utils/grpc/clients/ManagerClient.js';
 
-class Visitor extends VisitorServer
+class Visitor
 {
-    #manager = new ManagerClient();
-    constructor() { super(); }
+    #manager;
+    constructor(managerPort)
+    {
+        this.#manager = new ManagerClient(managerPort);
+        this.#run();
+    }
+    async #run()
+    {
+        const menu = await this.#manager.getMenu({ });
+        const chosen = this.#choose(menu);
+        await this.#manager.placeOrder(chosen);
+    }
     
-    
-    /*start() { }
 
-    get_menu() { } // Asks the manager for the menu, waits for the response and calls choose_from_menu
-    choose_from_menu() { } // Takes some time to read the menu and choose one or more items from it. When done, calls place_order
-    place_order() { } // Calls the manager to create an order*/
+    async #choose(menu)
+    {
+        return menu;
+    }
 };
-console.log(new Visitor());
+
+const visitor = new Visitor(process.argv.at(-1));

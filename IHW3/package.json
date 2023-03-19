@@ -6,8 +6,10 @@
     "license": "MIT",
     "description": "",
     "main": "index.js",
-    "scripts": {
-        "test": "node visitor/index.js 8000"
+    "scripts":
+    {
+        "visitor": "node visitor/index.js 8080",
+        "manager": "node manager/index.js 8080"
     },
     "dependencies": {
         "@grpc/grpc-js": "^1.8.12",
