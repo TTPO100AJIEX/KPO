@@ -19,9 +19,10 @@ import utility from "./plugins/utility.js"; await app.register(utility);
 import security from "./plugins/security.js"; await app.register(security);
 import response from "./plugins/response.js"; await app.register(response);
 import oauth from "./plugins/oauth.js"; await app.register(oauth);
-// import routes from "./plugins/routes.js"; app.register(routes);
+import routes from "./plugins/routes.js"; app.register(routes);
 
 await app.ready();
+
 app.listen({ "port": config.accounts.port, "host": "0.0.0.0" }, (err, address) => 
 {
     if (err) throw err;

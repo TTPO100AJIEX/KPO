@@ -8,7 +8,7 @@
         {
             "host": "localhost",
             "port": 5432,
-            "database": "kpoihw4-accounts",
+            "database": "accounts",
             "user": "postgres",
             "password": "F3gH3!0jEq"
         },
@@ -39,7 +39,7 @@
         {
             "host": "localhost",
             "port": 5432,
-            "database": "kpoihw4-orders",
+            "database": "orders",
             "user": "postgres",
             "password": "F3gH3!0jEq"
         },

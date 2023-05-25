@@ -6,9 +6,11 @@ import pg from 'pg';
 import format from 'pg-format';
 pg.types.setTypeParser(pg.types.builtins.INTERVAL, value => new Interval(value));
 
-class PostgreSQL
+export default class PostgreSQL
 {
     static #DefaultOptions = { parseInputDatesAsUTC: true, application_name: config.application };
+    static format = format;    
+    format = format;
 
     #options;
     constructor(options) { this.#options = { ...PostgreSQL.#DefaultOptions, ...options }; }
@@ -33,7 +35,6 @@ class PostgreSQL
         return(rows);
     }
 
-    format = format;
     async query(query, params, { parse = false, one_response = false } = { })
     {
         let data = await this.#connection.query(query, params);

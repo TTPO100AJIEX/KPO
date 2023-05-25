@@ -11,9 +11,39 @@ import config from "common/configs/config.json" assert { type: "json" };
 
 import cookie from "@fastify/cookie";
 
-async function register_oauth(app, options)
+async function register(app, options)
 {
     await app.register(cookie, { secret: config.accounts.secret });
+
+    app.decorate("createAccount", async function()
+    {
+
+    });
+
+    app.decorateReply("login", async function(login, password)
+    {
+        const req = this.request, res = this;
+        if (!(await req.check_authentication(req.body.authentication))) return res.error(400);
+        
+        const users = await InternalDatabase.query(`SELECT id, login, password, permissions FROM users WHERE login = $1`, [ login ]);
+        if (users.length == 0) return res.error(401, [ "Ошибка авторизации!", "Такого пользователя нет!" ]);
+        for (const user of users)
+        {
+            if (!(await bcrypt.compare(password, user.password))) continue;
+            req.session_id = crypto.randomBytes(32).toString('base64');
+            const user_data = { user_id: user.id, login: user.login, permissions: user.permissions, expiration: Date.now() + config.website.user_data_expiration };
+            await Cache.set_expire(`session_id-${req.session_id}`, JSON.stringify(user_data), config.website.authorization_expiration);
+            res.setCookie('__Secure-authorization', req.session_id, { domain: config.website.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true });
+            return res.redirect("/database");
+        }
+        return res.error(401, [ "Ошибка авторизации!", "Пароль неверный!" ]);
+    });
+
+    app.decorateReply("logout", async function()
+    {
+        this.clearCookie('__Secure-authorization', { domain: config.website.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true });
+        return this.status(301).redirect("/");
+    });
 
     
     /*app.decorateRequest("session_id", null);
@@ -84,35 +114,11 @@ async function register_oauth(app, options)
     });
 
 
-
-    app.decorateReply("login", async function(login, password)
-    {
-        const req = this.request, res = this;
-        if (!(await req.check_authentication(req.body.authentication))) return res.error(400);
-        
-        const users = await InternalDatabase.query(`SELECT id, login, password, permissions FROM users WHERE login = $1`, [ login ]);
-        if (users.length == 0) return res.error(401, [ "Ошибка авторизации!", "Такого пользователя нет!" ]);
-        for (const user of users)
-        {
-            if (!(await bcrypt.compare(password, user.password))) continue;
-            req.session_id = crypto.randomBytes(32).toString('base64');
-            const user_data = { user_id: user.id, login: user.login, permissions: user.permissions, expiration: Date.now() + config.website.user_data_expiration };
-            await Cache.set_expire(`session_id-${req.session_id}`, JSON.stringify(user_data), config.website.authorization_expiration);
-            res.setCookie('__Secure-authorization', req.session_id, { domain: config.website.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true });
-            return res.redirect("/database");
-        }
-        return res.error(401, [ "Ошибка авторизации!", "Пароль неверный!" ]);
-    });
-
-    app.decorateReply("logout", async function()
-    {
-        this.clearCookie('__Secure-authorization', { domain: config.website.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true });
-        return this.status(301).redirect("/");
-    });*/
+*/
 }
 
 import plugin from 'fastify-plugin';
-export default plugin(register_oauth, {
+export default plugin(register, {
     name: 'oauth',
     decorators:
     {
