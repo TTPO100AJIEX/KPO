@@ -1,0 +1,16 @@
+openapi: 3.0.3
+info:
+  version: 8.5.1
+  title: "@fastify/swagger"
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: __Secure-Authorization
+      description: Default authorization
+  schemas: {}
+paths: {}
+servers:
+  - url: https://127.0.0.1:5000
+    description: Authorization server

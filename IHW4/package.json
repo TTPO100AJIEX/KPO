@@ -1,0 +1,29 @@
+{
+    "name": "ihw4",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "",
+    "author": "TTPO100AJIEX",
+    "license": "MIT",
+    "scripts": {
+        "authorization": "node authorization/index.js"
+    },
+    "dependencies": {
+        "@fastify/circuit-breaker": "^3.2.0",
+        "@fastify/compress": "^6.3.0",
+        "@fastify/cookie": "^8.3.0",
+        "@fastify/helmet": "^10.1.1",
+        "@fastify/rate-limit": "^8.0.0",
+        "@fastify/swagger": "^8.5.1",
+        "@fastify/under-pressure": "^8.2.0",
+        "ajv-formats": "^2.1.1",
+        "bcrypt": "^5.1.0",
+        "common": "file:common",
+        "fastify": "^4.17.0",
+        "fastify-plugin": "^4.5.0",
+        "ioredis": "^5.3.2",
+        "pg": "^8.11.0",
+        "pg-format": "^1.0.4",
+        "postgres-interval": "^4.0.0"
+    }
+}
