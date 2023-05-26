@@ -75,7 +75,7 @@ async function register(app, options)
     {
         if (!req.routeConfig?.access) return;
         const authorization = await req.authorize();
-        if (!req.routeConfig.access.includes(authorization?.role || null)) return res.error(403);
+        if (!req.routeConfig.access.includes(authorization?.role || null)) throw 403;
     });
 
     app.decorateReply("login", async function(username, password)
@@ -94,12 +94,4 @@ async function register(app, options)
 }
 
 import plugin from 'fastify-plugin';
-export default plugin(register, {
-    name: 'oauth',
-    decorators:
-    {
-        reply: [ "error" ]
-    },
-    dependencies: [ 'response' ],
-    encapsulate: false
-});
+export default plugin(register, { name: 'oauth', encapsulate: false });

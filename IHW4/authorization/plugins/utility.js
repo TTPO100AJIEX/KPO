@@ -14,12 +14,12 @@ async function register(app, options)
         onCircuitOpen: async (req, res) =>
         {
             console.warn(`@fastify/circuit-breaker: onCircuitOpen triggered for ${req.routerPath}${req.query}${JSON.stringify(req.body)}`);
-            return res.error(508);
+            throw 508;
         },
         onTimeout: async (req, res) =>
         {
             console.warn(`@fastify/circuit-breaker: onTimeout triggered for ${req.routerPath}${req.query}${JSON.stringify(req.body)}`);
-            return res.error(504);
+            throw 504;
         }
     });
     
@@ -38,7 +38,7 @@ async function register(app, options)
         {
             if (type === under_pressure.TYPE_HEAP_USED_BYTES) { console.warn(`Heap has been exhausted: ${value}`); return; }
             if (type === under_pressure.TYPE_RSS_BYTES) { console.warn(`RSS has been exhausted: ${value}`); return; }
-            return res.error(503);
+            throw 503;
         },
         exposeStatusRoute:
         {
@@ -77,11 +77,12 @@ async function register(app, options)
     app.addSchema({
         $id: "http_error",
         type: "object",
-        required: [ "error" ],
+        required: [ "title", "message" ],
         additionalProperties: false,
         properties:
         {
-            "error": { type: "string" }
+            "title": { type: "string" },
+            "message": { type: "string" }
         }
     });
     app.addSchema({

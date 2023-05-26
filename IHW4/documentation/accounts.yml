@@ -13,10 +13,13 @@ components:
     def-0:
       type: object
       required:
-        - error
+        - title
+        - message
       additionalProperties: false
       properties:
-        error:
+        title:
+          type: string
+        message:
           type: string
       title: http_error
     def-1:

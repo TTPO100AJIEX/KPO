@@ -7,6 +7,8 @@
     "license": "MIT",
     "scripts": {
         "authorization": "node authorization/index.js",
+        "order-handler": "node order-handler/index.js",
+        "order-manager": "node order-manager/index.js",
         
         "db:accounts:backup": "node databases/accounts/backup.js",
         "db:accounts:delete": "node databases/accounts/delete.js",
