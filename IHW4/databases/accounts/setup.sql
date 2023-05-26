@@ -1,8 +1,10 @@
 CREATE TYPE USER_ROLE AS ENUM ('CUSTOMER', 'CHEF', 'MANAGER');
+CREATE DOMAIN EMAIL AS TEXT CHECK (VALUE ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$');
 CREATE TABLE users
 (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
+    email EMAIL NOT NULL,
     password CHAR(60) NOT NULL,
     role USER_ROLE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),

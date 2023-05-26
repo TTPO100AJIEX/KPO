@@ -73,7 +73,28 @@ async function register(app, options)
             }
         }
     });
-  
+
+    app.addSchema({
+        $id: "http_error",
+        type: "object",
+        required: [ "error" ],
+        additionalProperties: false,
+        properties:
+        {
+            "error": { type: "string" }
+        }
+    });
+    app.addSchema({
+        $id: "http_ok",
+        type: "object",
+        required: [ "ok" ],
+        additionalProperties: false,
+        properties:
+        {
+            "ok": { const: true }
+        }
+    });
+    
     app.addHook("onReady", function (done)
     {
         fs.mkdirSync("documentation", { recursive: true });

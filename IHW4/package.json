@@ -22,12 +22,12 @@
         "db:orders:fill": "node databases/orders/fill.js",
         "db:orders:recreate": "npm run db:orders:backup && npm run db:orders:delete && npm run db:orders:create && npm run db:orders:setup && npm run db:orders:fill",
 
-        "db:backup": "npm run db:accounts:backup && npm run dn:orders:backup",
-        "db:delete": "npm run db:accounts:delete && npm run dn:orders:delete",
-        "db:create": "npm run db:accounts:create && npm run dn:orders:create",
-        "db:setup": "npm run db:accounts:setup && npm run dn:orders:setup",
-        "db:fill": "npm run db:accounts:fill && npm run dn:orders:fill",
-        "db:recreate": "npm run db:accounts:recreate && npm run dn:orders:recreate"
+        "db:backup": "npm run db:accounts:backup && npm run db:orders:backup",
+        "db:delete": "npm run db:accounts:delete && npm run db:orders:delete",
+        "db:create": "npm run db:accounts:create && npm run db:orders:create",
+        "db:setup": "npm run db:accounts:setup && npm run db:orders:setup",
+        "db:fill": "npm run db:accounts:fill && npm run db:orders:fill",
+        "db:recreate": "npm run db:accounts:recreate && npm run db:orders:recreate"
     },
     "dependencies": {
         "@fastify/circuit-breaker": "^3.2.0",

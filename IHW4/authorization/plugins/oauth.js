@@ -1,81 +1,57 @@
-
-/*
-import config from 'common/configs/config.js';
-import { InternalDatabase } from 'common/postgreSQL/postgreSQL.js';
-import { Cache } from "common/redis/redis.js";
+import config from "common/configs/config.json" assert { type: "json" };
+import { AccountsDatabase } from "common/postgreSQL/postgreSQL.js";
+import { AccountsCache } from "common/redis/redis.js";
 
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';*/
-
-import config from "common/configs/config.json" assert { type: "json" };
+import crypto from 'crypto';
 
 import cookie from "@fastify/cookie";
 
 async function register(app, options)
 {
+    app.addSchema({ $id: "id", type: "integer", minimum: -2147483648, maximum: 2147483647 });
+    app.addSchema({ $id: "username", type: "string", maxLength: 50 });
+    app.addSchema({ $id: "email", type: "string", format: "email" });
+    app.addSchema({ $id: "password", type: "string" });
+    app.addSchema({ $id: "user_role", enum: [ 'CUSTOMER', 'CHEF', 'MANAGER' ] });
+
     await app.register(cookie, { secret: config.accounts.secret });
+    // const COOKIE_NAME = '__Secure-authorization';
+    // const COOKIE_OPTIONS = { domain: config.accounts.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true };
+    const COOKIE_NAME = 'Authorization';
+    const COOKIE_OPTIONS = { domain: config.accounts.host, path: '/', secure: false, httpOnly: true, sameSite: 'Lax', signed: true };
 
-    app.decorate("createAccount", async function()
+    app.decorate("createAccount", async function(username, email, password, role)
     {
-
+        password = await bcrypt.hash(password, config.accounts.bcrypt.saltRounds);
+        await AccountsDatabase.query(`INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4)`, [ username, email, password, role ]);
     });
 
-    app.decorateReply("login", async function(login, password)
-    {
-        const req = this.request, res = this;
-        if (!(await req.check_authentication(req.body.authentication))) return res.error(400);
-        
-        const users = await InternalDatabase.query(`SELECT id, login, password, permissions FROM users WHERE login = $1`, [ login ]);
-        if (users.length == 0) return res.error(401, [ "Ошибка авторизации!", "Такого пользователя нет!" ]);
-        for (const user of users)
-        {
-            if (!(await bcrypt.compare(password, user.password))) continue;
-            req.session_id = crypto.randomBytes(32).toString('base64');
-            const user_data = { user_id: user.id, login: user.login, permissions: user.permissions, expiration: Date.now() + config.website.user_data_expiration };
-            await Cache.set_expire(`session_id-${req.session_id}`, JSON.stringify(user_data), config.website.authorization_expiration);
-            res.setCookie('__Secure-authorization', req.session_id, { domain: config.website.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true });
-            return res.redirect("/database");
-        }
-        return res.error(401, [ "Ошибка авторизации!", "Пароль неверный!" ]);
-    });
-
-    app.decorateReply("logout", async function()
-    {
-        this.clearCookie('__Secure-authorization', { domain: config.website.host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax', signed: true });
-        return this.status(301).redirect("/");
-    });
-
-    
-    /*app.decorateRequest("session_id", null);
+    app.decorateRequest("session_id", null);
     app.decorateRequest("get_sessionid", function()
     {
         if (this.session_id) return this.session_id;
-        if ("__Secure-authorization" in this.cookies)
-        {
-            let session_id = { valid: false };
-            try { session_id = this.unsignCookie(this.cookies["__Secure-authorization"]); } catch(err) { }
-            if (session_id.valid && session_id.value.length == 44) this.session_id = session_id.value;
-        }
+        try {
+            const session_id = this.unsignCookie(this.cookies[COOKIE_NAME]);
+            if (session_id.valid && session_id.value.length == 44) return this.session_id = session_id.value;
+            return this.session_id = null;
+        } catch(err) { }
+    });
+    app.decorateRequest("create_sessionid", async function(data)
+    {
+        data.expiration = Date.now() + config.accounts.user_data_expiration;
+        this.session_id = crypto.randomBytes(32).toString('base64');
+        await AccountsCache.set_expire(`session_id-${this.session_id}`, JSON.stringify(data), config.accounts.authorization_expiration);
         return this.session_id;
     });
-
-    app.decorateRequest("authentication", null);
-    app.decorateRequest("authentication_data", null);
-    app.decorateRequest("authenticate", async function()
+    app.decorateRequest("update_sessionid", async function(data)
     {
-        if (this.authentication) return this.authentication;
-        this.authentication = crypto.randomBytes(16).toString('hex');
-        await Cache.set_expire(`authentication-${this.authentication}`, JSON.stringify({ "ip": this.ip, "page": this.url }), config.website.authentication_expiration);
-        return this.authentication;
+        data.expiration = Date.now() + config.accounts.user_data_expiration;
+        await AccountsCache.set_keepttl(`session_id-${this.get_sessionid()}`, JSON.stringify(data));
     });
-    app.decorateRequest("check_authentication", async function(code)
+    app.decorateRequest("remove_sessionid", async function(data)
     {
-        if (this.authentication_data) return this.authentication_data;
-        let authentication = await Cache.get_delete(`authentication-${code}`);
-        if (!authentication) return this.authentication_data = null;
-        authentication = JSON.parse(authentication);
-        if (this.ip != authentication.ip) return this.authentication_data = null;
-        return this.authentication_data = authentication;
+        await AccountsCache.delete(`session_id-${this.get_sessionid()}`);
     });
 
     app.decorateRequest("authorization", null);
@@ -83,38 +59,38 @@ async function register(app, options)
     {
         if (this.authorization) return this.authorization;
         if (!this.get_sessionid()) return this.authorization = null;
-        let authorization = await Cache.get_expire(`session_id-${this.session_id}`, config.website.authorization_expiration); // { "user_id": 1 }
+        let authorization = await AccountsCache.get_expire(`session_id-${this.get_sessionid()}`, config.accounts.authorization_expiration);
         if (!authorization) return this.authorization = null;
         authorization = JSON.parse(authorization);
-
         if (!authorization.expiration || new Date(authorization.expiration) <= new Date())
         {
-            authorization = await InternalDatabase.query(`SELECT id AS user_id, login, permissions FROM users WHERE id = $1`, [ authorization.user_id ], { one_response: true });
-            if (!authorization) { await Cache.delete(`session_id-${this.session_id}`); return this.authorization = null; }
-            authorization = { ...authorization, expiration: Date.now() + config.website.user_data_expiration };
-            await Cache.set_keepttl(`session_id-${this.session_id}`, JSON.stringify(authorization));
+            authorization = await AccountsDatabase.query(`SELECT id, username, role FROM users WHERE id = $1`, [ authorization.id ], { one_response: true });
+            if (!authorization) { await req.remove_sessionid(); return this.authorization = null; }
+            await this.update_sessionid(authorization);
         }
-        
         return this.authorization = authorization;
     });
 
-
-
-    app.addHook('preValidation', async (req, res) =>
-    {
-        if (!req.routerPath || !req.routeConfig?.access || req.routeConfig.access === "only_public") return;
-        await req.authenticate();
-    });
     app.addHook('preHandler', async (req, res) => 
     {
-        if (!req.routeConfig?.access || req.routeConfig.access === "only_public") return;
-        if (req.method != "GET" && !(await req.check_authentication(req.body.authentication))) return res.error(400);
-        await req.authorize();
-        if (!req.authorization && req.routeConfig.access == "authorization") return res.error(401);
+        if (!req.routeConfig?.access) return;
+        const authorization = await req.authorize();
+        if (!req.routeConfig.access.includes(authorization?.role || null)) return res.error(403);
     });
 
+    app.decorateReply("login", async function(username, password)
+    {
+        const user = await AccountsDatabase.query(`SELECT id, username, password, role FROM users WHERE username = $1`, [ username ], { one_response: true });
+        if (!user) throw { statusCode: 400, message: "Такого пользователя нет!" };
+        if (!(await bcrypt.compare(password, user.password))) throw { statusCode: 401, message: "Пароль неверный!" };
+        this.setCookie(COOKIE_NAME, await this.request.create_sessionid({ id: user.id, username: user.username, role: user.role }), COOKIE_OPTIONS);
+    });
 
-*/
+    app.decorateReply("logout", async function()
+    {
+        await this.request.remove_sessionid();
+        this.clearCookie(COOKIE_NAME, COOKIE_OPTIONS);
+    });
 }
 
 import plugin from 'fastify-plugin';
