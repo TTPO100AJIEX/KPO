@@ -59,10 +59,12 @@ async function register(app, options)
         if (config.stage == "testing") console.error(error);
 
         if (Number.isInteger(error)) error = { statusCode: error };
-        if (!Number.isInteger(error) && typeof error != "object") error = { statusCode: 500, message: `${error}` };
-        error.statusCode ??= 500;
-        error.title ??= get_default_error_title(error.statusCode);
-        error.message ??= get_default_error_message(error.statusCode);
+        if (typeof error != "object") error = { statusCode: 500, message: `${error}` };
+        error = {
+            statusCode: error.statusCode ?? 500,
+            title: error.title ?? get_default_error_title(error.statusCode),
+            message: error.message ?? get_default_error_message(error.statusCode)
+        };
         return res.status(error.statusCode).send(error);
     });
 }

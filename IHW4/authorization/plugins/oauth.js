@@ -12,7 +12,7 @@ async function register(app, options)
     app.addSchema({ $id: "id", type: "integer", minimum: -2147483648, maximum: 2147483647 });
     app.addSchema({ $id: "username", type: "string", maxLength: 50 });
     app.addSchema({ $id: "email", type: "string", format: "email" });
-    app.addSchema({ $id: "password", type: "string" });
+    app.addSchema({ $id: "password", type: "string", format: "password" });
     app.addSchema({ $id: "user_role", enum: [ 'CUSTOMER', 'CHEF', 'MANAGER' ] });
 
     await app.register(cookie, { secret: config.accounts.secret });

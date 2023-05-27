@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  version: 8.5.1
+  title: "@fastify/swagger"
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: __Secure-Authorization
+      description: Default authorization
+  schemas:
+    def-0:
+      type: integer
+      minimum: -2147483648
+      maximum: 2147483647
+      title: id
+    def-1:
+      type: object
+      required:
+        - title
+        - message
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+      title: http_error
+    def-2:
+      type: object
+      required:
+        - ok
+      additionalProperties: false
+      properties:
+        ok:
+          enum:
+            - true
+      title: http_ok
+paths:
+  /create_order:
+    post:
+      summary: Create a new order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - dishes
+              additionalProperties: false
+              properties:
+                dishes:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                      - id
+                      - amount
+                    additionalProperties: false
+                    properties:
+                      id:
+                        $ref: "#/components/schemas/def-0"
+                      amount:
+                        type: integer
+                        minimum: 1
+                special_requests:
+                  type: string
+                  default: None
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: "#/components/schemas/def-0"
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /get_order:
+    get:
+      summary: Get information about the order
+      parameters:
+        - schema:
+            $ref: "#/components/schemas/def-0"
+          in: query
+          name: id
+          required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: "#/components/schemas/def-0"
+                  user_id:
+                    $ref: "#/components/schemas/def-0"
+                  status:
+                    enum:
+                      - WAITING
+                      - PROCESSING
+                      - COMPLETED
+                      - CANCELLED
+                  special_requests:
+                    type: string
+                  created_at:
+                    type: string
+                    format: iso-date-time
+                  updated_at:
+                    type: string
+                    format: iso-date-time
+                  dishes:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - price
+                        - quantity
+                        - description
+                      additionalProperties: false
+                      properties:
+                        id:
+                          $ref: "#/components/schemas/def-0"
+                        name:
+                          type: string
+                          maxLength: 100
+                        price:
+                          type: number
+                        quantity:
+                          type: integer
+                          minimum: 1
+                        description:
+                          type: string
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+servers:
+  - url: https://127.0.0.1:18000
+    description: Authorization server

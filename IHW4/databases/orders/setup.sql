@@ -48,8 +48,8 @@ FOR EACH ROW EXECUTE FUNCTION synchronize_orders_updated_at();
 
 CREATE TABLE order_dishes
 (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     order_id INT NOT NULL REFERENCES orders(id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE,
     dish_id INT NOT NULL REFERENCES dishes(id) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE,
-    quantity INT NOT NULL CHECK (quantity >= 0)
+    quantity INT NOT NULL CHECK (quantity > 0),
+    PRIMARY KEY (order_id, dish_id)
 );

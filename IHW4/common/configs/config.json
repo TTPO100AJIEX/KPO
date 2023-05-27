@@ -21,7 +21,7 @@
         },
         
         "host": "127.0.0.1",
-        "port": 6000,
+        "port": 15000,
 
         "secret": "230odiXKUiExkHAQ3UMTqRzDnGxN2loy",
         "authorization_expiration": 3600000,
@@ -52,6 +52,6 @@
         },
 
         "host": "127.0.0.1",
-        "port": 8000
+        "port": 18000
     }
 }

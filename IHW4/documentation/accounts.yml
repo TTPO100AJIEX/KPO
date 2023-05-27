@@ -176,5 +176,5 @@ paths:
               schema:
                 $ref: "#/components/schemas/def-0"
 servers:
-  - url: https://127.0.0.1:6000
+  - url: https://127.0.0.1:15000
     description: Authorization server
