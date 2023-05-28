@@ -5,7 +5,7 @@ async function register(app, options)
     const DELETE_DISH_SCHEMA =
     {
         summary: "Delete the dish",
-        query:
+        params:
         {
             type: "object",
             required: [ "id" ],
@@ -22,9 +22,9 @@ async function register(app, options)
             default: { $ref: "http_error" }
         }
     };
-    app.delete("/dish", { schema: DELETE_DISH_SCHEMA, config: { access: [ 'MANAGER' ] } }, async function(req, res)
+    app.delete("/dish/:id", { schema: DELETE_DISH_SCHEMA, config: { access: [ 'MANAGER' ] } }, async function(req, res)
     {
-        await OrdersDatabase.query(`DELETE FROM dishes WHERE id = $1`, [ req.query.id ]);
+        await OrdersDatabase.query(`DELETE FROM dishes WHERE id = $1`, [ req.params.id ]);
         return res.send({ ok: true });
     });
 }

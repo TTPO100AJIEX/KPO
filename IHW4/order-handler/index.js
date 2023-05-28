@@ -2,7 +2,7 @@ import { OrdersDatabase } from "common/postgreSQL/postgreSQL.js";
 
 async function handle_order()
 {
-    const { id } = await OrdersDatabase.query(`SELECT id FROM orders WHERE status = 'WAITING' LIMIT 1`, [ ], { one_response: true });
+    const { id } = await OrdersDatabase.query(`SELECT id FROM orders WHERE status = 'WAITING' LIMIT 1`, [ ], { one_response: true }) || { id: undefined };
     if (id)
     {
         await OrdersDatabase.query(`UPDATE orders SET status = 'PROCESSING' WHERE id = $1`, [ id ]);

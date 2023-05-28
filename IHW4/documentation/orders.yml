@@ -82,12 +82,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
+  "/dish/{id}":
     delete:
       summary: Delete the dish
       parameters:
         - schema:
             $ref: "#/components/schemas/def-0"
-          in: query
+          in: path
           name: id
           required: true
       security:
@@ -110,7 +111,7 @@ paths:
       parameters:
         - schema:
             $ref: "#/components/schemas/def-0"
-          in: query
+          in: path
           name: id
           required: true
       security:
@@ -128,8 +129,6 @@ paths:
                   - description
                   - price
                   - quantity
-                  - created_at
-                  - updated_at
                 additionalProperties: false
                 properties:
                   id:
@@ -144,12 +143,6 @@ paths:
                   quantity:
                     type: integer
                     minimum: 1
-                  created_at:
-                    type: string
-                    format: iso-date-time
-                  updated_at:
-                    type: string
-                    format: iso-date-time
         default:
           description: Default Response
           content:
@@ -164,15 +157,12 @@ paths:
             schema:
               type: object
               required:
-                - id
                 - name
                 - description
                 - price
                 - quantity
               additionalProperties: false
               properties:
-                id:
-                  $ref: "#/components/schemas/def-0"
                 name:
                   type: string
                   maxLength: 100
@@ -184,6 +174,12 @@ paths:
                   type: integer
                   minimum: 1
         required: true
+      parameters:
+        - schema:
+            $ref: "#/components/schemas/def-0"
+          in: path
+          name: id
+          required: true
       security:
         - cookieAuth: []
       responses:
@@ -284,12 +280,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
+  "/order/{id}":
     get:
       summary: Get information about the order
       parameters:
         - schema:
             $ref: "#/components/schemas/def-0"
-          in: query
+          in: path
           name: id
           required: true
       security:

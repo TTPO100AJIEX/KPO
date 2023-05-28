@@ -5,14 +5,23 @@ async function register(app, options)
     const UPDATE_DISH_SCHEMA =
     {
         summary: "Update the dish",
-        body:
+        params:
         {
             type: "object",
-            required: [ "id", "name", "description", "price", "quantity" ],
+            required: [ "id" ],
             additionalProperties: false,
             properties:
             {
-                id: { $ref: "id" },
+                "id": { $ref: "id" }
+            }
+        },
+        body:
+        {
+            type: "object",
+            required: [ "name", "description", "price", "quantity" ],
+            additionalProperties: false,
+            properties:
+            {
                 name: { type: "string", maxLength: 100 },
                 description: { type: "string" },
                 price: { type: "number" },
@@ -26,10 +35,10 @@ async function register(app, options)
             default: { $ref: "http_error" }
         }
     };
-    app.patch("/dish", { schema: UPDATE_DISH_SCHEMA, config: { access: [ 'MANAGER' ] } }, async function(req, res)
+    app.patch("/dish/:id", { schema: UPDATE_DISH_SCHEMA, config: { access: [ 'MANAGER' ] } }, async function(req, res)
     {
         const queryString = `UPDATE dishes SET (name, description, price, quantity) = ($2, $3, $4, $5) WHERE id = $1`;
-        const queryParams = [ req.body.id, req.body.name, req.body.description, req.body.price, req.body.quantity ];
+        const queryParams = [ req.params.id, req.body.name, req.body.description, req.body.price, req.body.quantity ];
         await OrdersDatabase.query(queryString, queryParams);
         return res.send({ ok: true });
     });

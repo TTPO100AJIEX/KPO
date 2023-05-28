@@ -5,13 +5,6 @@ async function register(app, options)
     const GET_MENU_SCHEMA =
     {
         summary: "Get the menu",
-        query:
-        {
-            type: "object",
-            required: [ ],
-            additionalProperties: false,
-            properties: { }
-        },
         security: [ { cookieAuth: [ ] } ],
         response:
         {

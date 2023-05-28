@@ -5,7 +5,7 @@ async function register(app, options)
     const GET_DISH_SCHEMA =
     {
         summary: "Get information about the dish",
-        query:
+        params:
         {
             type: "object",
             required: [ "id" ],
@@ -21,7 +21,7 @@ async function register(app, options)
             200:
             {
                 type: "object",
-                required: [ "id", "name", "description", "price", "quantity", "created_at", "updated_at" ],
+                required: [ "id", "name", "description", "price", "quantity" ],
                 additionalProperties: false,
                 properties:
                 {
@@ -29,18 +29,16 @@ async function register(app, options)
                     name: { type: "string", maxLength: 100 },
                     description: { type: "string" },
                     price: { type: "number" },
-                    quantity: { type: "integer", minimum: 1 },
-                    created_at: { type: "string", format: "iso-date-time" },
-                    updated_at: { type: "string", format: "iso-date-time" }
+                    quantity: { type: "integer", minimum: 1 }
                 }
             },
             default: { $ref: "http_error" }
         }
     };
-    app.get("/dish", { schema: GET_DISH_SCHEMA, config: { access: [ 'MANAGER' ] } }, async function(req, res)
+    app.get("/dish/:id", { schema: GET_DISH_SCHEMA, config: { access: [ 'MANAGER' ] } }, async function(req, res)
     {
-        const dishData = await OrdersDatabase.query(`SELECT * FROM dishes WHERE id = $1`, [ req.query.id ], { one_response: true });
-        if (!dishData) throw { statusCode: 404, message: `Dish with id ${req.query.id} does not exist` };
+        const dishData = await OrdersDatabase.query(`SELECT * FROM dishes WHERE id = $1`, [ req.params.id ], { one_response: true });
+        if (!dishData) throw { statusCode: 404, message: `Dish with id ${req.params.id} does not exist` };
         return res.send(dishData);
     });
 }

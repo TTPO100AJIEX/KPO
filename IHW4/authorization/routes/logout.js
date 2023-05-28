@@ -5,7 +5,6 @@ async function register(app, options)
     const LOGOUT_SCHEMA =
     {
         summary: "Logout",
-        query: { type: "object", additionalProperties: false, properties: { } },
         security: [ { cookieAuth: [ ] } ],
         response:
         {

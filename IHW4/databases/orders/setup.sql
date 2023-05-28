@@ -4,20 +4,8 @@ CREATE TABLE dishes
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price NUMERIC(10, 2) NOT NULL,
-    quantity INT NOT NULL CHECK (quantity >= 0),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    quantity INT NOT NULL CHECK (quantity >= 0)
 );
-
-CREATE FUNCTION synchronize_dishes_updated_at() RETURNS TRIGGER
-LANGUAGE plpgsql VOLATILE LEAKPROOF STRICT PARALLEL SAFE AS
-$$ BEGIN
-    NEW.created_at = OLD.created_at;
-    NEW.updated_at = NOW();
-	RETURN NEW;
-END $$;
-CREATE TRIGGER dishes_updated_at_synchronization AFTER UPDATE ON dishes
-FOR EACH ROW EXECUTE FUNCTION synchronize_dishes_updated_at();
 
 
 
@@ -40,7 +28,7 @@ $$ BEGIN
     NEW.updated_at = NOW();
 	RETURN NEW;
 END $$;
-CREATE TRIGGER orders_updated_at_synchronization AFTER UPDATE ON orders
+CREATE TRIGGER orders_updated_at_synchronization BEFORE UPDATE ON orders
 FOR EACH ROW EXECUTE FUNCTION synchronize_orders_updated_at();
 
 
