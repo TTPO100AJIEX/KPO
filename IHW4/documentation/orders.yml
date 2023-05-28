@@ -38,7 +38,204 @@ components:
             - true
       title: http_ok
 paths:
-  /create_order:
+  /dish:
+    post:
+      summary: Create a dish
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - quantity
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                description:
+                  type: string
+                price:
+                  type: number
+                quantity:
+                  type: integer
+                  minimum: 1
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: "#/components/schemas/def-0"
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    delete:
+      summary: Delete the dish
+      parameters:
+        - schema:
+            $ref: "#/components/schemas/def-0"
+          in: query
+          name: id
+          required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-2"
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    get:
+      summary: Get information about the dish
+      parameters:
+        - schema:
+            $ref: "#/components/schemas/def-0"
+          in: query
+          name: id
+          required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - quantity
+                  - created_at
+                  - updated_at
+                additionalProperties: false
+                properties:
+                  id:
+                    $ref: "#/components/schemas/def-0"
+                  name:
+                    type: string
+                    maxLength: 100
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  quantity:
+                    type: integer
+                    minimum: 1
+                  created_at:
+                    type: string
+                    format: iso-date-time
+                  updated_at:
+                    type: string
+                    format: iso-date-time
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    patch:
+      summary: Update the dish
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - name
+                - description
+                - price
+                - quantity
+              additionalProperties: false
+              properties:
+                id:
+                  $ref: "#/components/schemas/def-0"
+                name:
+                  type: string
+                  maxLength: 100
+                description:
+                  type: string
+                price:
+                  type: number
+                quantity:
+                  type: integer
+                  minimum: 1
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-2"
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /menu:
+    get:
+      summary: Get the menu
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                    - description
+                    - price
+                  additionalProperties: false
+                  properties:
+                    id:
+                      $ref: "#/components/schemas/def-0"
+                    name:
+                      type: string
+                      maxLength: 100
+                    description:
+                      type: string
+                    price:
+                      type: number
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /order:
     post:
       summary: Create a new order
       requestBody:
@@ -57,12 +254,12 @@ paths:
                     type: object
                     required:
                       - id
-                      - amount
+                      - quantity
                     additionalProperties: false
                     properties:
                       id:
                         $ref: "#/components/schemas/def-0"
-                      amount:
+                      quantity:
                         type: integer
                         minimum: 1
                 special_requests:
@@ -87,7 +284,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /get_order:
     get:
       summary: Get information about the order
       parameters:
@@ -156,4 +352,4 @@ paths:
                 $ref: "#/components/schemas/def-1"
 servers:
   - url: https://127.0.0.1:18000
-    description: Authorization server
+    description: Order management server

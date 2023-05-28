@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import url from 'url';
 
 async function register(app, options)
 {
-    const routesDirectory = path.join(path.dirname(url.fileURLToPath(import.meta.url)), "../routes");
-    for (const filename of fs.readdirSync(routesDirectory))
+    for (const filename of fs.readdirSync(options.directory))
     {
-        if (!fs.lstatSync(path.join(routesDirectory, filename)).isFile()) continue;
-        const { default: module } = await import(path.join("../routes", filename));
+        const fileStats = fs.lstatSync(path.join(options.directory, filename));
+        if (fileStats.isDirectory()) await register(app, { directory: path.join(options.directory, filename) });
+        if (!fileStats.isFile()) continue;
+        const { default: module } = await import(path.join(options.directory, filename));
         app.register(module);
     }
     await app.after();

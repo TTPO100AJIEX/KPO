@@ -48,12 +48,14 @@ async function register(app, options)
             default: { $ref: "http_error" }
         }
     };
-    app.get("/get_order", { schema: GET_ORDER_SCHEMA, config: { access: [ 'CUSTOMER', 'CHEF', 'MANAGER' ] } }, async function(req, res)
+    app.get("/order", { schema: GET_ORDER_SCHEMA, config: { access: [ 'CUSTOMER', 'CHEF', 'MANAGER' ] } }, async function(req, res)
     {
         const dish_to_json = `(to_jsonb(dishes.*) - 'created_at' - 'updated_at') || (to_jsonb(order_dishes.*) - 'dish_id' - 'order_id')`;
         const dishesQueryString = `SELECT array_agg(${dish_to_json}) FROM order_dishes INNER JOIN dishes ON order_dishes.dish_id = dishes.id WHERE order_id = orders.id`;
         const queryString = `SELECT id, user_id, status, special_requests, created_at, updated_at, (${dishesQueryString}) AS dishes FROM orders WHERE id = $1`;
-        return res.send(await OrdersDatabase.query(queryString, [ req.query.id ], { one_response: true }));
+        const orderData = await OrdersDatabase.query(queryString, [ req.query.id ], { one_response: true });
+        if (!orderData) throw { statusCode: 404, message: `Order with id ${req.query.id} does not exist` };
+        return res.send(orderData);
     });
 }
 

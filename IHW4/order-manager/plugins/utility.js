@@ -63,7 +63,7 @@ async function register(app, options)
     await app.register(swagger, {
         openapi:
         {
-            servers: [ { url: `https://${config.orders.host}:${config.orders.port}`, description: "Authorization server" } ],
+            servers: [ { url: `https://${config.orders.host}:${config.orders.port}`, description: "Order management server" } ],
             components:
             {
                 securitySchemes:
