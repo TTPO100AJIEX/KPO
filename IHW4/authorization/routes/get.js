@@ -3,7 +3,6 @@ async function register(app, options)
     const GET_SCHEMA =
     {
         summary: "Get user information",
-        query: { type: "object", additionalProperties: false, properties: { } },
         security: [ { cookieAuth: [ ] } ],
         response:
         {
