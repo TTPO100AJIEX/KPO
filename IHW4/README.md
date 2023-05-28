@@ -14,14 +14,14 @@
     - `/accounts/redis` and `/orders/redis` hold Redis connection information
     - `/accounts/host` and `/orders/host` specify the hosts web servers run on
     - `/accounts/port` and `/orders/port` specify the ports web servers run on
-    - `/accounts/secret` specify a secret key to sign cookie files
+    - `/accounts/secret` specifies a secret key to sign cookie files
     - `/accounts/authorization_expiration` specifies the maximum duration of a session in millliseconds
     - `/accounts/user_data_expiration` specifies the maximum interval of user data synchronization with postgreSQL
-    - `/accounts/bcrypt/saltRounds` specifies the amount of rounds to apply salt when hashing passwords
+    - `/accounts/bcrypt/saltRounds` specifies the amount of rounds of salt application when hashing passwords
 - Run `npm run db:full` to create the required databases
 - Run `npm run authorization` to start the authorization service
 - Run `npm run order-handler` to start the order handling service that processes the orders and changes their statuses
-- Run `npm run order-manager` to start the order manager service that receives requests to manage orders, dishes nad the menu
+- Run `npm run order-manager` to start the order management service that receives requests to manage orders, dishes and the menu
 # Documentation
 - Endpoints description is given as swagger documentation stored in [documentation folder](documentation)
 - Database setup scripts can be found in [databases/accounts/setup.sql](databases/accounts/setup.sql) and [databases/orders/setup.sql](databases/orders/setup.sql). In comparison to the task, all scripts have been adapted for use with postgreSQL, and the following changes have been made:
@@ -32,10 +32,10 @@
         - Removed the table `session` as Redis is used for that
     - Orders database
         - Did some minor renaming
-        - Added triggers to prohibit changing `created_at` and to automatically maintatin `updated_at`
+        - Added trigger to prohibit changing `created_at` and to automatically maintatin `updated_at`
         - Added type `ORDER_STATUS` for better data constraining
         - Removed `id` and `price` from the order dishes table
-- Sessions IDs stored in signed cookie files are used for authorization instead of JWT as the latter is not secure and is not designed to be used for authorization according to the specification
+- For authorization sessions IDs stored in signed cookie files are used instead of JWT as the latter is not secure and is not designed to be used for authorization according to the specification
 - When processing, orders are cancelled with a 25% chance. It takes 10 to 20 seconds to process one order. One order is processed every 30 to 60 seconds.
 # Architecture
 - The program consists of 7 parts:
@@ -48,4 +48,4 @@
     - Orders processing service
 - The connections between those parts are as follows:
     - Accounts postgreSQL database, accounts Redis cache sevice, and the authorization web service make up the first microservice that implements endpoints to create accounts and authorize user requests.
-    - Everything else makes up the second microservice that works with user orders and does requests to the authorization web service to authorize the requests.
+    - Everything else makes up the second microservice that works with user orders and does requests to the first microservice to authorize the requests.
