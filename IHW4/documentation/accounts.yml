@@ -47,6 +47,7 @@ components:
       title: email
     def-5:
       type: string
+      format: password
       title: password
     def-6:
       enum:

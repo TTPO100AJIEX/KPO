@@ -53,7 +53,6 @@ async function register(app, options)
         const dish_to_json = `(to_jsonb(dishes.*) - 'created_at' - 'updated_at') || (to_jsonb(order_dishes.*) - 'dish_id' - 'order_id')`;
         const dishesQueryString = `SELECT array_agg(${dish_to_json}) FROM order_dishes INNER JOIN dishes ON order_dishes.dish_id = dishes.id WHERE order_id = orders.id`;
         const queryString = `SELECT id, user_id, status, special_requests, created_at, updated_at, (${dishesQueryString}) AS dishes FROM orders WHERE id = $1`;
-        console.log(await OrdersDatabase.query(queryString, [ req.query.id ], { one_response: true }))
         return res.send(await OrdersDatabase.query(queryString, [ req.query.id ], { one_response: true }));
     });
 }

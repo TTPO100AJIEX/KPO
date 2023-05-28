@@ -9,7 +9,11 @@ async function handle_order()
         await new Promise(resolve => setTimeout(resolve, Math.random() * 10000 + 20000)); // 10 to 20 seconds processing
         if (Math.random() < 0.25) // 25% chance of failure
         {
-            await OrdersDatabase.query(`UPDATE orders SET status = 'CANCELLED' WHERE id = $1`, [ id ]);
+            await OrdersDatabase.query_multiple([
+                OrdersDatabase.format(`UPDATE orders SET status = 'CANCELLED' WHERE id = %L`, id),
+                OrdersDatabase.format(`UPDATE dishes SET quantity = dishes.quantity + order_dishes.quantity
+                                        FROM order_dishes WHERE order_dishes.order_id = %L AND dishes.id = order_dishes.dish_id`, id)
+            ]);
         }
         else
         {
